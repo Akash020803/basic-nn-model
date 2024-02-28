@@ -1,24 +1,25 @@
-# Developing a Neural Network Regression Model
+[### EX NO : 01
+### DATE  : 
+# <p align="center">Developing a Neural Network Regression Model</p>
 
-## AIM
+## AIM :
 
 To develop a neural network regression model for the given dataset.
 
-## THEORY
+## THEORY :
 
-Creating a neural network regression model involves designing a computational architecture that learns relationships within data to make continuous predictions. Through iterative training, the model adjusts its parameters to minimize prediction errors and optimize performance. This approach utilizes neural networks, composed of interconnected layers of neurons, to effectively capture complex patterns in input-output relationships for regression tasks, facilitating accurate and generalized predictions in various domains such as finance, healthcare, and engineering.
-```
-Input layer: 1 neuron.
-First hidden layer: 3 neurons with ReLU activation function.
-Second hidden layer: 2 neurons with ReLU activation function.
-Output layer: 1 neuron.
-```
+Neural networks consist of simple input/output units called neurons. In this article, we will see how neural networks can be applied to regression problems.
 
-## Neural Network Model
+Regression helps in establishing a relationship between a dependent variable and one or more independent variables. Although neural networks are complex and computationally expensive, they are flexible and can dynamically pick the best type of regression, and if that is not enough, hidden layers can be added to improve prediction.
 
-![image](https://github.com/muppirgautham/basic-nn-model/assets/94810884/020b6a5b-967b-4351-9833-1b2d6e87b89a)
+Build your training and test set from the dataset, here we are making the neural network 2 hidden layer with activation layer as relu and with their nodes in them. Now we will fit our dataset and then predict the value.
 
-## DESIGN STEPS
+## Neural Network Model :
+<p align="center">
+    <img width="495" alt="image" src="https://user-images.githubusercontent.com/94174503/224912342-a8a9076e-6ce9-4ff7-b9d9-6eabf6b8509b.png">
+</p>
+
+## DESIGN STEPS :
 
 ### STEP 1:
 
@@ -30,7 +31,7 @@ Split the dataset into training and testing
 
 ### STEP 3:
 
-Create MinMaxScalar objects ,fit the model and transform the data.
+Create MinMaxScalar object, fit the model and transform the data.
 
 ### STEP 4:
 
@@ -48,97 +49,110 @@ Plot the performance plot
 
 Evaluate the model with the testing data.
 
-## PROGRAM
-### Name: Akash A
-### Register Number: 212221230003
-```
+## PROGRAM :
+Developed By: Akash A
+<br/>
+Register Number: 212221230003
+### Importing Modules
+```py
 from google.colab import auth
 import gspread
 from google.auth import default
+
 import pandas as pd
-
-auth.authenticate_user()
-creds, _ = default()
-gc = gspread.authorize(creds)
-
-worksheet = gc.open('exp1dl').sheet1
-
-rows = worksheet.get_all_values()
-
-df = pd.DataFrame(rows[1:], columns=rows[0])
-df = df.astype({'Input':'float'})
-df = df.astype({'output':'float'})
-
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from google.colab import auth
-import gspread
-from google.auth import default
+import matplotlib.pyplot as plt
 
+from tensorflow.keras.models import Sequential as Seq
+from tensorflow.keras.layers import Dense as Den
+from tensorflow.keras.metrics import RootMeanSquaredError as rmse
+```
+### Authenticate &  Create Dataframe using Data in Sheets
+```py
 auth.authenticate_user()
 creds, _ = default()
 gc = gspread.authorize(creds)
 
-worksheet = gc.open('exp1dl').sheet1
-data = worksheet.get_all_values()
+sheet = gc.open('exp1').sheet1 
+rows = sheet.get_all_values()
 
-dataset1 = pd.DataFrame(data[1:], columns=data[0])
-dataset1 = dataset1.astype({'Input':'float'})
-dataset1 = dataset1.astype({'Output':'float'})
-dataset1.head()
+df = pd.DataFrame(rows[1:], columns=rows[0])
+df = df.astype({'Table':'int'})
+df = df.astype({'Product':'int'})
+```
+### Assign X and Y values
+```py
+x = df[["Table"]] .values
+y = df[["Product"]].values
+```
+### Normalize the values & Split the data
+```py
+scaler = MinMaxScaler()
+scaler.fit(x)
+x_n = scaler.fit_transform(x)
 
+x_train,x_test,y_train,y_test = train_test_split(x_n,y,test_size = 0.3,random_state = 3)
+```
+### Create a Neural Network & Train it
+```py
+ai = Seq([
+    Den(8,activation = 'relu',input_shape=[1]),
+    Den(15,activation = 'relu'),
+    Den(1),
+])
 
-X = dataset1[['Input']].values
-y = dataset1[['output']].values
-X
-X_train,X_test,y_train,y_test = train_test_split(X,y,test_size = 0.33,random_state = 33)
+ai.compile(optimizer = 'rmsprop',loss = 'mse')
 
-Scaler = MinMaxScaler()
+ai.fit(x_train,y_train,epochs=3000)
+```
+</br>
 
-Scaler.fit(X_train)
-
-X_train1 = Scaler.transform(X_train)
-ex1_model = Sequential([
-    Dense(units = 3, activation = 'relu', input_shape=[1]),
-    Dense(units = 2, activation = 'relu'),
-    Dense(units = 1)
-    ])
-ex1_model.compile(optimizer = 'rmsprop', loss = 'mse')
-ex1_model.fit(X_train1,y_train,epochs = 5000)
-ex1_model.summary()
-loss_df = pd.DataFrame(ex1_model.history.history)
-
-loss_df.plot()
-
-X_test1 = Scaler.transform(X_test)
-
-ex1_model.evaluate(X_test1,y_test)
-
-X_n1 = [[30]]
-
-X_n1_1 = Scaler.transform(X_n1)
-
-ex1_model.predict(X_n1_1)
-
+### Plot the Loss
+```py
+loss_plot = pd.DataFrame(ai.history.history)
+loss_plot.plot()
+```
+### Evaluate the model
+```py
+err = rmse()
+preds = ai.predict(x_test)
+err(y_test,preds)
+```
+### Predict for some value
+```py
+x_n1 = [[30]]
+x_n_n = scaler.transform(x_n1)
+ai.predict(x_n_n)
 ```
 ## Dataset Information
 
-![image](https://github.com/muppirgautham/basic-nn-model/assets/94810884/b85f615f-8757-4678-ac8f-93e3a4546fe6)
+<p align="center">
+    <img width="250" alt="image" src="https://user-images.githubusercontent.com/94174503/224907997-4569fb3e-03e6-4edc-95f6-70c96570aa9b.png">
+</p>
 
-## OUTPUT
+## OUTPUT :
 
 ### Training Loss Vs Iteration Plot
 
-![image](https://github.com/muppirgautham/basic-nn-model/assets/94810884/275e985c-4971-48cc-93e7-6fa26e6fc183)
+<p align="center">
+    <img width="415" alt="image" src="https://user-images.githubusercontent.com/94174503/224906956-88b6c85f-546b-4f5c-a974-2b8042ee56b2.png">
+    </br>
+    <img width="415" alt="image" src="https://user-images.githubusercontent.com/94174503/224907002-74a2c21d-4e5b-4073-afd8-8836a5e46605.png">
+</p>
 
 ### Test Data Root Mean Squared Error
-![image](https://github.com/muppirgautham/basic-nn-model/assets/94810884/0f875435-c0e8-4ccf-917f-d7922647e06b)
 
+<p align="center">
+    <img width="415" alt="image" src="https://user-images.githubusercontent.com/94174503/224907125-30c81f2b-3b82-4ba5-83ac-32a3c12681bd.png">
+</p>
 
 ### New Sample Data Prediction
-![image](https://github.com/muppirgautham/basic-nn-model/assets/94810884/c9763ba6-0c23-47ad-abc2-c89e8298fcae)
 
+<p align="center">
+    <img width="415" alt="image" src="https://user-images.githubusercontent.com/94174503/224907202-ef329292-6170-4a7f-a73d-933cd2b0bde4.png">
+</p>
 
-## RESULT
-
-Thus, The Process of developing a neural network regression model for the created dataset is successfully executed.
+## RESULT :
+Thus a neural network regression model for the given dataset is written and executed successfully.
+](https://github.com/Akash020803/basic-nn-model.git)https://github.com/Akash020803/basic-nn-model.git
