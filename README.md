@@ -155,4 +155,4 @@ ai.predict(x_n_n)
 
 ## RESULT :
 Thus a neural network regression model for the given dataset is written and executed successfully.
-](https://github.com/Akash020803/basic-nn-model.git)https://github.com/Akash020803/basic-nn-model.git
+
